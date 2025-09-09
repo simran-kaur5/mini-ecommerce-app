@@ -31,7 +31,7 @@ This app allows you to manage customers, products, and orders with a simple fron
 1. **Clone the repository**:
 
 ```bash
-git clone https://github.com/simran-kaur5/mini-ecommerce.git
+git clone https://github.com/simran-kaur5/mini-ecommerce-app.git
 cd mini-ecommerce/backend 
 npm install
 nodemon app.js
