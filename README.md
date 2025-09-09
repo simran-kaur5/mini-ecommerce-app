@@ -17,23 +17,6 @@ This app allows you to manage customers, products, and orders with a simple fron
 
 ---
 
-## Project Structure
-
-miniProject/
-│
-├─ backend/
-│ ├─ app.js # Main server file
-│ ├─ package.json # Node dependencies
-│ └─ node_modules/ # Installed packages
-│
-├─ frontend/
-│ └─ index.html # Frontend HTML + JS + CSS
-│
-└─ .gitignore # Files to ignore in GitHub
-
-
----
-
 ## Prerequisites
 
 - **Node.js** (v18+ recommended)
