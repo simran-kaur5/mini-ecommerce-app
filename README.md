@@ -1,4 +1,4 @@
-# Mini Ecommerce App 🛒
+# Mini Ecommerce App 
 
 A simple **Mini Ecommerce** application built using **Node.js**, **Express**, **MongoDB**, and vanilla **HTML/CSS/JS**.  
 This app allows you to manage customers, products, and orders with a simple frontend interface.
