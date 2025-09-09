@@ -32,7 +32,9 @@ This app allows you to manage customers, products, and orders with a simple fron
 
 ```bash
 git clone https://github.com/simran-kaur5/mini-ecommerce-app.git
-cd mini-ecommerce/backend 
-npm install
+
+```
+cd mini-ecommerce/backend <br>
+npm install <br>
 nodemon app.js
 
