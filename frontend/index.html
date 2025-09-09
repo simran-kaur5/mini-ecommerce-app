@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Ecommerce App</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="icons8-shopping-cart-50.png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button, select { margin: 5px; padding: 5px; }
+    .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    input, button, select {
+      margin: 5px;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    pre {
+      background-color: #f9f9f9;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mini Ecommerce App</h1>
+
+  <!-- Customers -->
+  <div class="box">
+  <h2>View Customers</h2>
+  <button onclick="toggleSection('customers')">See all our Customers</button>
+  <pre id="customers" style="display:none;"></pre>
+</div>
+
+  <!-- Products -->
+  <div class="box">
+  <h2>View Products</h2>
+  <button onclick="toggleSection('products')">See available Products</button>
+  <pre id="products" style="display:none;"></pre>
+</div>
+
+  <!-- Place Order -->
+  <div class="box">
+  <h2>Place an Order</h2>
+  <input type="text" id="productName" placeholder="Product Name">
+  <input type="email" id="customerEmail" placeholder="Customer Email">
+  <input type="number" id="quantity" placeholder="Quantity">
+  <select id="status">
+    <option value="pending">Pending</option>
+    <option value="completed">Completed</option>
+  </select>
+  <button onclick="placeOrder()">Place Order</button>
+  <pre id="orderResult"></pre>
+
+  <!-- hidden customer signup -->
+ <div id="signupBox" style="display:none; margin-top:10px;">
+  <h3>Sign Up Customer</h3>
+  <input type="text" id="signupName" placeholder="Name">
+  <input type="email" id="signupEmail" placeholder="Email">
+  <input type="text" id="signupCity" placeholder="City">
+  <button onclick="signupCustomer()">Sign Up</button>
+  <pre id="signupResult"></pre>
+</div>
+
+
+
+  <!-- Orders -->
+  <div class="box">
+  <h2>View Orders</h2>
+  <button onclick="toggleSection('orders')">Get Orders</button>
+  <pre id="orders" style="display:none;"></pre>
+</div>
+
+  <script>
+    const API_URL = "http://localhost:3000";
+    const sections = { customers: false, products: false, orders: false };
+
+    async function toggleSection(section) {
+      const pre = document.getElementById(section);
+      if (!sections[section]) {
+        let data;
+        try {
+          const res = await fetch(`${API_URL}/${section}`);
+          data = await res.json();
+        } catch(err) {
+          data = { error: err.message };
+        }
+        pre.textContent = JSON.stringify(data, null, 2);
+        pre.style.display = "block";
+        sections[section] = true;
+      } else {
+        pre.style.display = "none";
+        sections[section] = false;
+      }
+    }
+
+
+    async function getCustomers() {
+      const res = await fetch(`${API_URL}/customers`);
+      const data = await res.json();
+      document.getElementById("customers").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function getProducts() {
+      const res = await fetch(`${API_URL}/products`);
+      const data = await res.json();
+      document.getElementById("products").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function getOrders() {
+      const res = await fetch(`${API_URL}/orders`);
+      const data = await res.json();
+      document.getElementById("orders").textContent = JSON.stringify(data, null, 2);
+    }
+
+  async function placeOrder() {
+  const productName = document.getElementById("productName").value;
+  const customerEmail = document.getElementById("customerEmail").value;
+  const quantity = parseInt(document.getElementById("quantity").value, 10);
+  const status = document.getElementById("status").value;
+
+  if (!productName || !customerEmail || !quantity || quantity <= 0) {
+    alert("Please fill all fields and ensure quantity > 0");
+    return;
+  }
+
+  const res = await fetch(`${API_URL}/order/place`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ productName, customerEmail, quantity, status })
+  });
+
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = { error: text }; }
+
+  document.getElementById("orderResult").textContent =
+    JSON.stringify(data, null, 2);
+
+  //  Show signup form if customer does not exist
+  if (data.error && data.error.includes("Customer not found")) {
+    document.getElementById("signupBox").style.display = "block";
+    document.getElementById("signupEmail").value = customerEmail; // pre-fill email
+  }
+}
+
+// Signup function
+async function signupCustomer() {
+  const name = document.getElementById("signupName").value.trim();
+const email = document.getElementById("signupEmail").value.trim();
+const city = document.getElementById("signupCity").value.trim();
+
+
+  if (!name || !email || !city) {
+    alert("Please fill all signup fields!");
+    return;
+  }
+
+  const res = await fetch(`${API_URL}/customer/sign`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, city })
+  });
+
+  const data = await res.json();
+  document.getElementById("signupResult").textContent =
+    JSON.stringify(data, null, 2);
+
+    // Optionally, clear the form
+    document.getElementById("signupName").value = "";
+    document.getElementById("signupEmail").value = "";
+    document.getElementById("signupCity").value = "";
+    if (data.customerId) {
+    document.getElementById("signupBox").style.display = "none";
+    }
+
+    alert("Customer signed up successfully! You can place the order now.");
+}
+
+
+
+  </script>
+</body>
+</html>
